@@ -1,0 +1,116 @@
+#!/bin/bash
+# created by: Zell
+#===============================================================================
+# variables
+
+#---------------------------------------
+# source file
+
+source /usr/local/sbin/stdlib
+
+#---------------------------------------
+# common values
+
+LOGNAME=pclean
+LOG=/var/log/$LOGNAME.log
+LOGRO=/etc/logrotate.d/$LOGNAME
+
+#===============================================================================
+# help text
+
+HELP_TXT="
+This script removes the SSL cert for the given hostname.
+
+SYNTAX:
+  # $PROG [OPTIONS]
+
+OPTIONS:
+  -h, --help         display this help text and exit
+  -l, --log          enable logging to a file
+  -v, --verbose      be verbose
+  -vv, --debug       turn on debugging (very verbose)
+  -dr, --dryrun      do a dry run
+
+EXAMPLES:
+  Normal operation:  # $PROG host.domain.com
+  Dry run:           # $PROG -vv -dr server.example.net
+  Logging:           # $PROG -v --log foo.bar.lan
+
+NOTES:
+  don't combine options:
+    correct:         # $PROG -l -vv
+    incorrect:       # $PROG -lvv
+
+"
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# 
+
+#===============================================================================
+# script start
+
+#---------------------------------------
+# process options
+
+while (( "$#" > 0 )) ;do
+  case $1 in
+    -h|--help)     f_usage 0                               ;;
+    -v|--verbose)  VERBOSE=true ;shift                     ;;
+    -l|--log)      LOGGING=true ;shift                     ;;
+    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
+    "")            f_msg -e "You need to provide a hostname as an argument." ;break		;;
+    *)             HOST=$1 ;break                          ;;
+  esac
+done
+LOGGING=false
+
+f_msg -l -d "SCRIPT START"
+
+#---------------------------------------
+# arguments
+
+f_msg -d "VERBOSE=$VERBOSE"
+f_msg -d "LOGGING=$LOGGING"
+f_msg -d "DEBUG=$DEBUG"
+f_msg -d "DRYRUN=$DRYRUN"
+
+#---------------------------------------
+# error checks
+
+f_vroot  # verify root execution
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# remove puppet cert
+
+PSSL=/var/lib/puppet/ssl
+if [ $HOST ] ;then
+  if [[ `/etc/init.d/puppetserver status` ]] ;then
+    f_msg "Removing puppet cert on puppet server for $HOST ..."
+    f_run "puppet cert clean $HOST"
+  else
+    f_msg "Removing puppet cert on puppet client for $HOST ..."
+    f_run "find $PSSL -name $HOST.pem -delete"
+  fi
+else
+  f_msg -e -d "You need to provide a hostname as an argument."
+fi
+
+#===============================================================================
+# cleanup
+
+#---------------------------------------
+# rotate log
+
+#f_logro
+
+#...................
+# exit
+
+f_exit

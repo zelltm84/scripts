@@ -1,0 +1,131 @@
+#!/bin/bash
+# created by: Zell
+#===============================================================================
+# variables
+
+#---------------------------------------
+# source file
+
+source /usr/local/sbin/stdlib
+
+#---------------------------------------
+# common values
+
+LOGNAME=foo
+LOG=/var/log/$LOGNAME.log
+LOGRO=/etc/logrotate.d/$LOGNAME
+
+#===============================================================================
+# help text
+
+HELP_TXT="
+This script runs:
+  # git branch -a --color
+  # git show-ref |egrep -i 'master|$BRANCH'
+	# git log --graph --all --decorate --abbrev-commit --oneline |head -10
+  # git status
+
+SYNTAX:
+  # $PROG [OPTIONS]
+
+OPTIONS:
+  -h, --help         display this help text and exit
+  -l, --log          enable logging to a file
+  -v, --verbose      be verbose
+  -vv, --debug       turn on debugging (very verbose)
+  -dr, --dryrun      do a dry run
+
+EXAMPLES:
+  Normal operation:  # $PROG
+  Dry run:           # $PROG -vv -dr
+  Logging:           # $PROG -v --log
+
+NOTES:
+  don't combine options:
+    correct:         # $PROG -l -vv
+    incorrect:       # $PROG -lvv
+
+"
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# 
+
+#===============================================================================
+# script start
+
+#---------------------------------------
+# process options
+
+while (( "$#" > 0 )) ;do
+  case $1 in
+    -h|--help)     f_usage 0                               ;;
+    -v|--verbose)  VERBOSE=true ;shift                     ;;
+    -l|--log)      LOGGING=true ;shift                     ;;
+    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
+    "")            break                                   ;;
+    *)             f_msg -e "Unkown option(s): $*" ;break  ;;
+  esac
+done
+
+f_msg -l -d "SCRIPT START"
+
+#---------------------------------------
+# arguments
+
+f_msg -d "VERBOSE=$VERBOSE"
+f_msg -d "LOGGING=$LOGGING"
+f_msg -d "DEBUG=$DEBUG"
+f_msg -d "DRYRUN=$DRYRUN"
+
+#---------------------------------------
+# error checks
+
+#f_vroot  # verify root execution
+if [[ ! -d ./.git ]] ;then
+  f_msg -e "Git has not been initialized here: `pwd`"
+fi
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# git branch
+
+f_msg "git branch -a --color"
+f_run "git branch -a --color"
+
+#---------------------------------------
+# git show-ref
+
+BRANCH=`git branch |awk '{print $2}'`
+f_msg "git show-ref |egrep -i 'master|$BRANCH'"
+f_run "git show-ref |egrep -i 'master|$BRANCH'"
+
+#---------------------------------------
+# git log
+
+f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head -10"
+f_run "git log --graph --all --decorate --abbrev-commit --oneline |head -10"
+
+#---------------------------------------
+# git status
+
+f_msg "git status"
+f_run "git status"
+
+#===============================================================================
+# cleanup
+
+#---------------------------------------
+# rotate log
+
+#f_logro
+
+#...................
+# exit
+
+f_exit

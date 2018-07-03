@@ -1,0 +1,143 @@
+#!/bin/bash
+# created by: Zell
+#===============================================================================
+# variables
+
+#---------------------------------------
+# source file
+
+source /usr/local/sbin/stdlib
+
+#---------------------------------------
+# common values
+
+LOGNAME=fix_perms
+LOG=/var/log/$LOGNAME.log
+LOGRO=/etc/logrotate.d/$LOGNAME
+
+#===============================================================================
+# help text
+
+HELP_TXT="
+This script fixes various permissions.
+
+SYNTAX:
+  # $PROG [OPTIONS]
+
+OPTIONS:
+  -h, --help         display this help text and exit
+  -l, --log          enable logging to a file
+  -v, --verbose      be verbose
+  -vv, --debug       turn on debugging (very verbose)
+  -dr, --dryrun      do a dry run
+
+EXAMPLES:
+  Normal operation:  # $PROG
+  Dry run:           # $PROG -vv -dr
+  Logging:           # $PROG -v --log
+
+NOTES:
+  don't combine options:
+    correct:         # $PROG -l -vv
+    incorrect:       # $PROG -lvv
+
+"
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# chmod file & directory defaults
+
+f_chmod () {
+if [ -d $1 ] ;then
+	f_msg "chmoding $1 directories ..."
+	f_run "find $1 -type d -exec chmod 0750 {} \;"
+	f_msg "chmoding $1 files ..."
+	f_run "find $1 -type f -exec chmod 0640 {} \;"
+fi
+}
+
+#===============================================================================
+# script start
+
+#---------------------------------------
+# process options
+
+while (( "$#" > 0 )) ;do
+  case $1 in
+    -h|--help)     f_usage 0                               ;;
+    -v|--verbose)  VERBOSE=true ;shift                     ;;
+    -l|--log)      LOGGING=true ;shift                     ;;
+    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
+    "")            break                                   ;;
+    *)             f_msg -e "Unkown option(s): $*" ;break  ;;
+  esac
+done
+
+f_msg -l -d "SCRIPT START"
+
+#---------------------------------------
+# arguments
+
+f_msg -d "VERBOSE=$VERBOSE"
+f_msg -d "LOGGING=$LOGGING"
+f_msg -d "DEBUG=$DEBUG"
+f_msg -d "DRYRUN=$DRYRUN"
+
+#---------------------------------------
+# error checks
+
+f_vroot  # verify root execution
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# fix puppet dir
+
+PDIR=/etc/puppet
+if [ -d $PDIR ] ;then
+	f_msg "chowning $PDIR ..."
+	f_run "chown -R root:puppet $PDIR"
+  f_chmod $PDIR
+fi
+
+#---------------------------------------
+# fix root dir
+
+RDIR=/root
+if [ -d $RDIR ] ;then
+	f_msg "chowning $RDIR ..."
+	f_run "chown -R root:root $RDIR"
+  f_chmod $RDIR
+fi
+
+#---------------------------------------
+# fix nagios dir
+
+NDIR=/etc/nagios
+NPWD=$NDIR/passwd
+if [ -d $NDIR ] ;then
+	f_msg "chowning $NDIR ..."
+	f_run "chown -R root:nagios $NDIR"
+  f_chmod $NDIR
+  if [ -f $NPWD ] ;then
+		f_msg -d "fixing apache files ..."
+		f_run "chown root:apache /etc/nagios/passwd"
+	fi
+fi
+
+#===============================================================================
+# cleanup
+
+#---------------------------------------
+# rotate log
+
+#f_logro
+
+#...................
+# exit
+
+f_exit

@@ -1,0 +1,149 @@
+#!/bin/bash
+# created by: Zell
+#===============================================================================
+# variables
+
+#---------------------------------------
+# source file
+
+source /usr/local/sbin/stdlib
+
+#---------------------------------------
+# common values
+
+LOGNAME=upsys
+LOG=/var/log/$LOGNAME.log
+LOGRO=/etc/logrotate.d/$LOGNAME
+
+#===============================================================================
+# help text
+
+HELP_TXT="
+This script updates the system based on distro.
+
+SYNTAX:
+  # $PROG [OPTIONS]
+
+OPTIONS:
+  -h, --help         display this help text and exit
+  -l, --log          enable logging to a file
+  -v, --verbose      be verbose
+  -vv, --debug       turn on debugging (very verbose)
+  -dr, --dryrun      do a dry run
+
+EXAMPLES:
+  Normal operation:  # $PROG
+  Dry run:           # $PROG -vv -dr
+  Logging:           # $PROG -v --log
+
+NOTES:
+  don't combine options:
+    correct:         # $PROG -l -vv
+    incorrect:       # $PROG -lvv
+
+"
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# update via apt
+
+f_apt () {
+f_msg "Updating apt-based distro ..."
+f_run "apt-get -y update"
+f_run "apt-get -y upgrade"
+f_run "apt-get -y dist-upgrade"
+f_run "apt-get -y autoremove"
+f_run "apt-get -y autoclean"
+}
+
+#---------------------------------------
+# update via yum
+
+f_yum () {
+f_msg "Updating yum-based distro ..."
+f_run "yum -y update"
+f_run "yum -y upgrade"
+f_run "yum -y clean all"
+}
+
+#===============================================================================
+# script start
+
+#---------------------------------------
+# process options
+
+while (( "$#" > 0 )) ;do
+  case $1 in
+    -h|--help)     f_usage 0                               ;;
+    -v|--verbose)  VERBOSE=true ;shift                     ;;
+    -l|--log)      LOGGING=true ;shift                     ;;
+    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
+    "")            break                                   ;;
+    *)             f_msg -e "Unkown option(s): $*" ;break  ;;
+  esac
+done
+LOGGING=false
+
+f_msg -l -d "SCRIPT START"
+
+#---------------------------------------
+# arguments
+
+f_msg -d "VERBOSE=$VERBOSE"
+f_msg -d "LOGGING=$LOGGING"
+f_msg -d "DEBUG=$DEBUG"
+f_msg -d "DRYRUN=$DRYRUN"
+
+#---------------------------------------
+# error checks
+
+f_vroot  # verify root execution
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# find distro
+
+#!/bin/bash
+if [[ ( `apt-get --help 2> /dev/null` ) ]] ;then
+  DISTRO=apt
+elif [[ ( `yum --help 2> /dev/null` ) ]] ;then
+  DISTRO=yum
+fi
+
+#---------------------------------------
+# update
+
+case $DISTRO in
+  apt)  f_apt                     ;;
+  yum)  f_yum                     ;;
+  *)    f_msg -w "Unkown Distro"  ;;
+esac
+
+f_msg "Updated DB ..."
+f_run "updatedb"
+
+#---------------------------------------
+# rkhunter
+
+if [[ (`rkhunter --help`) ]] ;then
+  f_msg "Updating RootKitHunter ..."
+  f_run "rkhunter --update --nocolors"
+fi
+
+#===============================================================================
+# cleanup
+
+#---------------------------------------
+# rotate log
+
+#f_logro
+
+#...................
+# exit
+
+f_exit

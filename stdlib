@@ -1,0 +1,136 @@
+#===============================================================================
+# variables
+
+#---------------------------------------
+# common values
+
+PROG=$(basename $0)
+SECDATE=`date +%s`          # seconds since 1970-01-01 00:00:00 UTC
+DAYDATE=`date +%F`           # year, month, and day: 2001-12-31
+TIMESTAMP=`date +%F-%H-%M-%S`  # year, month, day, hour (24), minute, second: 2001-12-31-23-59-59
+
+#---------------------------------------
+# initial values
+
+EXIT_CODE=0
+LOGGING=false
+VERBOSE=false
+DEBUG=false
+DRYRUN=false
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# exit
+
+f_exit () { f_msg "Exiting..." ;exit $EXIT_CODE ; }
+
+#---------------------------------------
+# usage
+
+f_usage () {
+printf "$HELP_TXT"
+EXIT_CODE=$1
+if [[ $EXIT_CODE > 0 ]] ;then
+echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+echo $MSG ;echo
+fi
+f_exit
+}
+
+#---------------------------------------
+# message
+
+f_msg () {
+# reset flags
+FLAGE=false ;FLAGW=false ;FLAGD=false ;FLAGL=false
+
+# process flags
+while (( "$#" > 0  )) ;do
+  case $1 in
+    -w|--warn)   FLAGW=true ;shift  ;;
+    -e|--error)  FLAGE=true ;shift  ;;
+    -l|--log)    FLAGL=true ;shift  ;;
+    -d|--debug)  FLAGD=true ;shift  ;;
+    ""|*)        break              ;;
+  esac
+done
+
+# prepend message
+if [ "$FLAGE" = true ] ;then
+  MSG="ERROR: $1"
+elif [ "$FLAGW" = true ] ;then
+  MSG="WARN:  $1"
+elif [ "$FLAGD" = true ] ;then
+  MSG="DEBUG: $1"
+else
+  MSG="INFO:  $1"
+fi
+
+# print message or not
+if [ "$FLAGE" = false ] ;then                          # if this isn't an error message, continue...
+  if [ "$FLAGD" = true ] && [ "$DEBUG" = true ] ;then  #   if this is a debug message & debug is enabled...
+    echo "$MSG"                                        #     print DEBUG message
+  elif [ "$VERBOSE" = true ] ;then                     #   if verbose is enabled...
+    if [ "$FLAGW" = true ] ;then                       #     and this is a warning message...
+      echo "$MSG"                                      #       print WARNING message
+    elif [ "$FLAGD" = false ] ;then                    #     and this isn't a debug message
+      echo "$MSG"                                      #       print VERBOSE message
+    fi                                                 #
+  fi                                                   #
+fi                                                     # skip printing errors until after the help text is displayed
+
+# extra processing
+if [ "$FLAGL" = true ] && [ "$LOGGING" = true ] && [ "$DRYRUN" = false ] ;then
+  echo "`date` $MSG" >> $LOG  # log the message
+fi
+if [ "$FLAGE" = true ] ;then
+  f_usage 3                   # display help and exit
+fi
+}
+
+#---------------------------------------
+# run or print
+
+f_run () {
+if [ "$DEBUG" = true ] || [ "$DRYRUN" = true ] || [ "$VERBOSE" = true ] ;then
+  f_msg -d "EXECUTE: $1"        # print command
+fi
+if [ "$DRYRUN" = false ] ;then
+  eval "$1"                     # run/execute command
+fi
+}
+
+#---------------------------------------
+# verify root execution
+
+f_vroot () {
+if [[ `whoami` != root ]] ;then
+  f_msg -e -d "This script needs to be run as root. Current user: `whoami`"
+fi
+}
+
+#---------------------------------------
+# rotate log file
+
+f_logro () {
+f_msg -d "LOGROTATE: create temporary log rotate config: $LOGROCONF"
+f_run "echo \"$LOG {
+  weekly
+  missingok
+  compress
+  dateext
+  dateformat -%Y-%m-%d
+  maxsize 300M
+  rotate 3
+  notifempty
+  create 0644 root root
+}\" > $LOGROCONF"
+f_msg -d "LOGROTATE: fix permissions: $LOG"
+f_run "chown root:root $LOG ;chmod 0644 $LOG"
+f_msg -d "LOGROTATE: rotate log: $LOG"
+f_run "logrotate -v $LOGROCONF"
+f_msg -d "LOGROTATE: delete temporary log rotate config: $LOGROCONF"
+f_run "rm -f $LOGROCONF"
+}

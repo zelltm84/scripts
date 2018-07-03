@@ -1,0 +1,125 @@
+#!/bin/bash
+# created by: Zell
+#===============================================================================
+# variables
+
+#---------------------------------------
+# source file
+
+source /usr/local/sbin/stdlib
+
+#---------------------------------------
+# common values
+
+LOGNAME=foo
+LOG=/var/log/$LOGNAME.log
+LOGRO=/etc/logrotate.d/$LOGNAME
+TMP=/tmp/ksshagent.$SECDATE
+
+#===============================================================================
+# help text
+
+HELP_TXT="
+This script searches for \"ssh-agent -s\" processes and kills them.
+
+SYNTAX:
+  # $PROG [OPTIONS]
+
+OPTIONS:
+  -h, --help         display this help text and exit
+  -l, --log          enable logging to a file
+  -v, --verbose      be verbose
+  -vv, --debug       turn on debugging (very verbose)
+  -dr, --dryrun      do a dry run
+
+EXAMPLES:
+  Normal operation:  # $PROG
+  Dry run:           # $PROG -vv -dr
+  Logging:           # $PROG -v --log
+
+NOTES:
+  don't combine options:
+    correct:         # $PROG -l -vv
+    incorrect:       # $PROG -lvv
+
+"
+
+#===============================================================================
+# functions
+
+#---------------------------------------
+# 
+
+#===============================================================================
+# script start
+
+#---------------------------------------
+# process options
+
+while (( "$#" > 0 )) ;do
+  case $1 in
+    -h|--help)     f_usage 0                               ;;
+    -v|--verbose)  VERBOSE=true ;shift                     ;;
+    -l|--log)      LOGGING=true ;shift                     ;;
+    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
+    "")            break                                   ;;
+    *)             f_msg -e "Unkown option(s): $*" ;break  ;;
+  esac
+done
+LOGGING=false
+
+f_msg -l -d "SCRIPT START"
+
+#---------------------------------------
+# arguments
+
+f_msg -d "VERBOSE=$VERBOSE"
+f_msg -d "LOGGING=$LOGGING"
+f_msg -d "DEBUG=$DEBUG"
+f_msg -d "DRYRUN=$DRYRUN"
+
+#---------------------------------------
+# error checks
+
+#f_vroot  # verify root execution
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# display before
+
+ps -ef |grep 'ssh-agent -s' |grep -v grep |head -n -6 |awk '{print $2}' > $TMP
+f_msg "Total 'ssh-agent -s' processes before: `cat $TMP |wc -l`"
+
+#---------------------------------------
+# kill ssh-agents
+
+f_msg "creating ssh-agent pid list..."
+for PID in $(cat $TMP) ;do
+	f_msg "killing $PID..."
+	f_run "kill -3 $PID"
+	sleep .1
+done
+
+#---------------------------------------
+# display after
+
+ps -ef |grep 'ssh-agent -s' |grep -v grep |awk '{print $2}' > $TMP
+f_msg "Total 'ssh-agent -s' processes after: `cat $TMP |wc -l`"
+
+#===============================================================================
+# cleanup
+
+rm -f $TMP
+
+#---------------------------------------
+# rotate log
+
+#f_logro
+
+#...................
+# exit
+
+f_exit
