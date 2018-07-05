@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=foo
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 
@@ -66,6 +66,7 @@ while (( "$#" > 0 )) ;do
     *)             f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
+LOGGING=false
 
 f_msg -l -d "SCRIPT START"
 
