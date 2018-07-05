@@ -115,22 +115,24 @@ fi
 # rotate log file
 
 f_logro () {
-f_msg -d "LOGROTATE: create temporary log rotate config: $LOGROCONF"
-f_run "echo \"$LOG {
-  weekly
-  missingok
-  compress
-  dateext
-  dateformat -%Y-%m-%d
-  maxsize 300M
-  rotate 3
-  notifempty
-  create 0644 root root
-}\" > $LOGROCONF"
-f_msg -d "LOGROTATE: fix permissions: $LOG"
-f_run "chown root:root $LOG ;chmod 0644 $LOG"
-f_msg -d "LOGROTATE: rotate log: $LOG"
-f_run "logrotate -v $LOGROCONF"
-f_msg -d "LOGROTATE: delete temporary log rotate config: $LOGROCONF"
-f_run "rm -f $LOGROCONF"
+if [[ LOGGING = true ]] ;then
+  f_msg -d "LOGROTATE: create temporary log rotate config: $LOGROCONF"
+  f_run "echo \"$LOG {
+    weekly
+    missingok
+    compress
+    dateext
+    dateformat -%Y-%m-%d
+    maxsize 300M
+    rotate 3
+    notifempty
+    create 0644 root root
+  }\" > $LOGROCONF"
+  f_msg -d "LOGROTATE: fix permissions: $LOG"
+  f_run "chown root:root $LOG ;chmod 0644 $LOG"
+  f_msg -d "LOGROTATE: rotate log: $LOG"
+  f_run "logrotate -v $LOGROCONF"
+  f_msg -d "LOGROTATE: delete temporary log rotate config: $LOGROCONF"
+  f_run "rm -f $LOGROCONF"
+fi
 }
