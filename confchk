@@ -73,7 +73,7 @@ DIR=/etc/httpd/conf
 
 CFILE=$DIR/httpd.conf
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "httpd -t -f $CFILE"
 fi
 }
@@ -86,7 +86,7 @@ DIR=/etc/nagios
 
 CFILE=$DIR/nagios.cfg
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "nagios -v $CFILE"
 fi
 }
@@ -99,13 +99,13 @@ DIR=/omd/sites/`whoami`/etc/nagios
 
 CFILE=$DIR/nagios.cfg
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "nagios -v $CFILE"
 fi
 
 CFILE=$DIR/nagios.d/omd.cfg
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "nagios -v $CFILE"
 fi
 }
@@ -118,7 +118,7 @@ DIR=/etc/haproxy
 
 CFILE=$DIR/haproxy.cfg
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "haproxy -c -f $CFILE"
 fi
 }
@@ -131,7 +131,7 @@ DIR=/etc/puppet
 
 CFILE=$DIR/manifests/site.pp
 f_check
-if [[ SKIP != true ]] ;then
+if [[ $SKIP != true ]] ;then
 	f_run "puppet parser validate $CFILE --verbose --debug"
 	if [[ $? == 0 ]] ;then
 		f_msg "puppet config OK"
