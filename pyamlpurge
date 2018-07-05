@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=puppetserver_purge
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 
@@ -100,7 +100,7 @@ f_run "find $DIR/ -type f -mtime +$DAYS -exec rm -f '{}' \; "
 #---------------------------------------
 # rotate log
 
-#f_logro
+f_logro
 
 #...................
 # exit

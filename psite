@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=psite
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 SFILE=/etc/puppet/manifests/site.pp
@@ -104,7 +104,7 @@ fi
 #---------------------------------------
 # rotate log
 
-#f_logro
+f_logro
 
 #...................
 # exit

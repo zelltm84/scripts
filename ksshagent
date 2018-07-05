@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=foo
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 TMP=/tmp/ksshagent.$SECDATE
@@ -117,7 +117,7 @@ rm -f $TMP
 #---------------------------------------
 # rotate log
 
-#f_logro
+f_logro
 
 #...................
 # exit

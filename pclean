@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=pclean
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 
@@ -108,7 +108,7 @@ fi
 #---------------------------------------
 # rotate log
 
-#f_logro
+f_logro
 
 #...................
 # exit
