@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=pstime
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 
@@ -98,7 +98,7 @@ f_run "ps -eo pid,etime,cmd |grep -v '`which $PROG`' |grep -v 'grep $PROCESS' |g
 #---------------------------------------
 # rotate log
 
-#f_logro
+f_logro
 
 #...................
 # exit

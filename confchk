@@ -11,7 +11,7 @@ source /usr/local/sbin/stdlib
 #---------------------------------------
 # common values
 
-LOGNAME=confcheck
+LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGRO=/etc/logrotate.d/$LOGNAME
 
@@ -139,17 +139,6 @@ if [[ SKIP != true ]] ;then
 fi
 }
 
-#---------------------------------------
-# check all config
-
-f_all () {
-f_apache
-f_nagios
-f_omd
-f_puppet
-f_haproxy
-}
-
 #===============================================================================
 # script start
 
@@ -163,12 +152,12 @@ while (( "$#" > 0 )) ;do
     -l|--log)        LOGGING=true ;shift                     ;;
     -vv|--debug)     VERBOSE=true ;DEBUG=true ;shift         ;;
     -dr|--dryrun)    VERBOSE=true ;DRYRUN=true ;shift        ;;
-    --all|"")        f_all ;break                            ;;
-		-a|--apache)     APACHE=true ;break                      ;;
-		-n|--nagios)     NAGIOS=true ;break                      ;;
-		-o|--omd)        OMD=true ;break                         ;;
-		-p|--puppet)     PUPPET=true ;break                      ;;
-		-hap|--haproxy)  HAPROXY=true ;break                     ;;
+    --all|"")        TYPE=all ;break                         ;;
+    -a|--apache)     TYPE=apache ;break                      ;;
+    -n|--nagios)     TYPE=nagios ;break                      ;;
+    -o|--omd)        TYPE=omd ;break                         ;;
+    -p|--puppet)     TYPE=puppet ;break                      ;;
+    -hap|--haproxy)  TYPE=haproxy ;break                     ;;
     *)               f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
@@ -187,6 +176,35 @@ f_msg -d "DRYRUN=$DRYRUN"
 # error checks
 
 f_vroot  # verify root execution
+
+#===============================================================================
+# body
+
+#---------------------------------------
+# process TYPE
+
+case $TYPE in
+  apache)   f_apache   ;;
+  nagios)   f_nagios   ;;
+  omd)      f_omd      ;;
+  puppet)   f_puppet   ;;
+  haproxy)  f_haproxy  ;;
+  all)
+    f_apache
+    f_nagios
+    f_omd
+    f_puppet
+    f_haproxy
+  ;;
+esac
+
+#===============================================================================
+# cleanup
+
+#---------------------------------------
+# rotate log
+
+f_logro
 
 #...................
 # exit
