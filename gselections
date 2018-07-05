@@ -22,7 +22,7 @@ HELP_TXT="
 This script checks to see if a specified packages is currently installed.
 
 SYNTAX:
-	# $PROG [OPTIONS] <package_name>
+  # $PROG [OPTIONS] <package_name>
 
 OPTIONS:
   -h, --help         display this help text and exit
@@ -32,8 +32,8 @@ OPTIONS:
   -dr, --dryrun      do a dry run
 
 EXAMPLES:
-  Normal operation:  # $PROG <package_name>
-  Dry run:           # $PROG -vv -dr ssh
+  Normal operation:  # $PROG ssh
+  Dry run:           # $PROG -vv -dr http
   Logging:           # $PROG -v --log haproxy
 
 NOTES:
@@ -80,7 +80,6 @@ f_msg -d "DRYRUN=$DRYRUN"
 #---------------------------------------
 # error checks
 
-#f_vroot  # verify root execution
 
 #===============================================================================
 # body
@@ -90,9 +89,9 @@ f_msg -d "DRYRUN=$DRYRUN"
 
 f_msg "Checking if $PACKAGE is installed..."
 if [[ ( `apt-get --help 2> /dev/null` ) ]] ;then
-	f_run "dpkg --get-selections |grep -i $PACKAGE"
+  f_run "dpkg --get-selections |grep -i $PACKAGE"
 elif [[ ( `yum --help 2> /dev/null` ) ]] ;then
-	f_run "rpm -qa |grep -i $PACKAGE"
+  f_run "rpm -qa |grep -i $PACKAGE"
 fi
 
 #===============================================================================
