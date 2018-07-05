@@ -30,12 +30,12 @@ OPTIONS:
   -v, --verbose      be verbose
   -vv, --debug       turn on debugging (very verbose)
   -dr, --dryrun      do a dry run
-	--all              check all configs
-	-a, --apache       check apache config
-	-n, --nagios       check nagios config
-	-o, --omd          check omd config
-	-p, --puppet       check puppet site.pp
-	-hap, --haproxy    check haproxy config
+  --all              check all configs
+  -a, --apache       check apache config
+  -n, --nagios       check nagios config
+  -o, --omd          check omd config
+  -p, --puppet       check puppet site.pp
+  -hap, --haproxy    check haproxy config
 
 EXAMPLES:
   Normal operation:  # $PROG
@@ -58,10 +58,10 @@ NOTES:
 f_check () {
 SKIP=false
 if [[ -f $CFILE ]] ;then
-	f_msg "Checking $CFILE ..."
+  f_msg "Checking $CFILE ..."
 else
-	f_msg -w "Skipping check because file does not exist: $CFILE"
-	SKIP=true
+  f_msg -w "Skipping check because file does not exist: $CFILE"
+  SKIP=true
 fi
 }
 
@@ -74,7 +74,7 @@ DIR=/etc/httpd/conf
 CFILE=$DIR/httpd.conf
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "httpd -t -f $CFILE"
+  f_run "httpd -t -f $CFILE"
 fi
 }
 
@@ -87,7 +87,7 @@ DIR=/etc/nagios
 CFILE=$DIR/nagios.cfg
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "nagios -v $CFILE"
+  f_run "nagios -v $CFILE"
 fi
 }
 
@@ -100,13 +100,13 @@ DIR=/omd/sites/`whoami`/etc/nagios
 CFILE=$DIR/nagios.cfg
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "nagios -v $CFILE"
+  f_run "nagios -v $CFILE"
 fi
 
 CFILE=$DIR/nagios.d/omd.cfg
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "nagios -v $CFILE"
+  f_run "nagios -v $CFILE"
 fi
 }
 
@@ -119,7 +119,7 @@ DIR=/etc/haproxy
 CFILE=$DIR/haproxy.cfg
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "haproxy -c -f $CFILE"
+  f_run "haproxy -c -f $CFILE"
 fi
 }
 
@@ -132,10 +132,10 @@ DIR=/etc/puppet
 CFILE=$DIR/manifests/site.pp
 f_check
 if [[ SKIP != true ]] ;then
-	f_run "puppet parser validate $CFILE --verbose --debug"
-	if [[ $? == 0 ]] ;then
-		f_msg "puppet config OK"
-	fi
+  f_run "puppet parser validate $CFILE --verbose --debug"
+  if [[ $? == 0 ]] ;then
+    f_msg "puppet config OK"
+  fi
 fi
 }
 
@@ -206,7 +206,7 @@ esac
 
 f_logro
 
-#...................
+#---------------------------------------
 # exit
 
 f_exit

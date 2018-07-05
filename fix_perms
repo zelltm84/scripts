@@ -51,10 +51,10 @@ NOTES:
 
 f_chmod () {
 if [ -d $1 ] ;then
-	f_msg "chmoding $1 directories ..."
-	f_run "find $1 -type d -exec chmod 0750 {} \;"
-	f_msg "chmoding $1 files ..."
-	f_run "find $1 -type f -exec chmod 0640 {} \;"
+  f_msg "chmoding $1 directories ..."
+  f_run "find $1 -type d -exec chmod 0750 {} \;"
+  f_msg "chmoding $1 files ..."
+  f_run "find $1 -type f -exec chmod 0640 {} \;"
 fi
 }
 
@@ -99,8 +99,8 @@ f_vroot  # verify root execution
 
 PDIR=/etc/puppet
 if [ -d $PDIR ] ;then
-	f_msg "chowning $PDIR ..."
-	f_run "chown -R root:puppet $PDIR"
+  f_msg "chowning $PDIR ..."
+  f_run "chown -R root:puppet $PDIR"
   f_chmod $PDIR
 fi
 
@@ -109,8 +109,8 @@ fi
 
 RDIR=/root
 if [ -d $RDIR ] ;then
-	f_msg "chowning $RDIR ..."
-	f_run "chown -R root:root $RDIR"
+  f_msg "chowning $RDIR ..."
+  f_run "chown -R root:root $RDIR"
   f_chmod $RDIR
 fi
 
@@ -120,13 +120,13 @@ fi
 NDIR=/etc/nagios
 NPWD=$NDIR/passwd
 if [ -d $NDIR ] ;then
-	f_msg "chowning $NDIR ..."
-	f_run "chown -R root:nagios $NDIR"
+  f_msg "chowning $NDIR ..."
+  f_run "chown -R root:nagios $NDIR"
   f_chmod $NDIR
   if [ -f $NPWD ] ;then
-		f_msg -d "fixing apache files ..."
-		f_run "chown root:apache /etc/nagios/passwd"
-	fi
+    f_msg -d "fixing apache files ..."
+    f_run "chown root:apache /etc/nagios/passwd"
+  fi
 fi
 
 #===============================================================================
