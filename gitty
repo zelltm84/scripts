@@ -22,7 +22,7 @@ HELP_TXT="
 This script runs:
   # git branch -a --color
   # git show-ref |egrep -i 'master|$BRANCH'
-	# git log --graph --all --decorate --abbrev-commit --oneline |head -10
+  # git log --graph --all --decorate --abbrev-commit --oneline |head -10
   # git status
 
 SYNTAX:
