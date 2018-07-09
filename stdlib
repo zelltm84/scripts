@@ -112,6 +112,15 @@ fi
 }
 
 #---------------------------------------
+# verify file/directory exists
+
+f_exist () {
+if [[ ! -e $1 ]] ;then
+  f_msg -e "Does not exist: $1"
+fi
+}
+
+#---------------------------------------
 # rotate log file
 
 f_logro () {
