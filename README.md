@@ -1,2 +1,2 @@
 # scripts
-Custom Scripts
+Custom Scripts for Linux and, sometimes, Mac
