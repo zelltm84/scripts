@@ -13,7 +13,7 @@ source /usr/local/sbin/stdlib
 
 LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
-LOGRO=/etc/logrotate.d/$LOGNAME
+LOGROCONF=/etc/logrotate.d/$LOGNAME
 
 #===============================================================================
 # help text
