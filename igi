@@ -90,7 +90,7 @@ f_msg -d "DRYRUN=$DRYRUN"
 # get IPs
 
 f_msg "Getting local IPs..."
-f_run "ifconfig -a |grep inet\ "
+f_run "ifconfig -a |grep inet\  |column -t"
 
 #===============================================================================
 # cleanup

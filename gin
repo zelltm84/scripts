@@ -118,7 +118,7 @@ COUNT=`echo "$LISTFILTER" |wc -l |xargs`
 LISTNUM=`echo "$LISTFILTER" |sort |cat -n |column -t`
 
 read -p "
-`echo "$LISTNUM"`
+`echo "$LISTNUM" |awk '{$4=$5=""; print $0}' |column -t`
 
 Which server do you want to log into?
 [1-$COUNT, (q)uit]: " SELECTION
