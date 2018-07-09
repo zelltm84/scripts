@@ -13,7 +13,7 @@ source /usr/local/sbin/stdlib
 
 LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
-LOGRO=/etc/logrotate.d/$LOGNAME
+LOGROCONF=/etc/logrotate.d/$LOGNAME
 
 #===============================================================================
 # help text
@@ -66,6 +66,7 @@ while (( "$#" > 0 )) ;do
     *)             f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
+VERBOSE=true
 LOGGING=false
 
 f_msg -l -d "SCRIPT START"
