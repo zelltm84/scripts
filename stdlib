@@ -5,9 +5,9 @@
 # common values
 
 PROG=$(basename $0)
-SECDATE=`date +%s`          # seconds since 1970-01-01 00:00:00 UTC
+SSDATE=`date +%s`            # seconds since 1970-01-01 00:00:00 UTC
 DAYDATE=`date +%F`           # year, month, and day: 2001-12-31
-TIMESTAMP=`date +%F-%H-%M-%S`  # year, month, day, hour (24), minute, second: 2001-12-31-23-59-59
+SECDATE=`date +%F-%H-%M-%S`  # year, month, day, hour (24), minute, second: 2001-12-31-23-59-59
 
 #---------------------------------------
 # initial values
