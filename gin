@@ -30,8 +30,8 @@ GIN stands for \"Get IN\".
 Reference File
   The reference file is used to populate the hostname list at the second prompt:
     $LISTFILE
-  The reference file needs 4 sections in it (separated by spaces):
-    <hostname> <user> <port> <private_ssh_key_file_path>
+  The reference file requires 4 sections in it (separated by spaces):
+    <hostname> <user> <port> <private_ssh_key_file_path> <optional comments>
 
 SYNTAX:
   # $PROG [OPTIONS]
