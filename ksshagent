@@ -48,7 +48,12 @@ NOTES:
 # functions
 
 #---------------------------------------
-# 
+# display
+
+f_display () {
+DISPLAY=`ps -ef |grep 'ssh-agent -s' | grep $(whoami) |grep -v grep |head -n -6 |awk '{print $2}'`
+f_msg "`date` Total 'ssh-agent -s' processes: `echo $DISPLAY |wc -l`"
+}
 
 #===============================================================================
 # script start
@@ -67,6 +72,7 @@ while (( "$#" > 0 )) ;do
     *)             f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
+VERBOSE=true
 LOGGING=false
 
 f_msg -l -d "SCRIPT START"
@@ -86,39 +92,22 @@ f_msg -d "DRYRUN=$DRYRUN"
 #===============================================================================
 # body
 
-#---------------------------------------
 # display before
+f_display
 
-ps -ef |grep 'ssh-agent -s' |grep -v grep |head -n -6 |awk '{print $2}' > $TMP
-f_msg "Total 'ssh-agent -s' processes before: `cat $TMP |wc -l`"
-
-#---------------------------------------
 # kill ssh-agents
-
 f_msg "creating ssh-agent pid list..."
-for PID in $(cat $TMP) ;do
+for PID in `echo $DISPLAY` ;do
   f_msg "killing $PID..."
   f_run "kill -3 $PID"
   sleep .1
 done
 
-#---------------------------------------
 # display after
-
-ps -ef |grep 'ssh-agent -s' |grep -v grep |awk '{print $2}' > $TMP
-f_msg "Total 'ssh-agent -s' processes after: `cat $TMP |wc -l`"
+f_display
 
 #===============================================================================
 # cleanup
 
-rm -f $TMP
-
-#---------------------------------------
-# rotate log
-
-f_logro
-
-#...................
-# exit
-
+f_logro  # rotate log
 f_exit
