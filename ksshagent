@@ -14,7 +14,7 @@ source /usr/local/sbin/stdlib
 LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGROCONF=/etc/logrotate.d/$LOGNAME
-TMP=/tmp/ksshagent.$SECDATE
+TMP=/tmp/ksshagent.$SSDATE
 
 #===============================================================================
 # help text
