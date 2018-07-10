@@ -128,7 +128,7 @@ Which server do you want to log into?
 
 if [[ $SELECTION == q ]] || [[ $SELECTION == quit ]] ;then
   f_exit
-elif [[ $SELECTION < 1 ]] || [[ $SELECTION > $COUNT ]] ;then
+elif [[ $SELECTION -lt 1 ]] || [[ $SELECTION -gt $COUNT ]] ;then
   f_msg -e -d "invalid selection"
 fi
 
