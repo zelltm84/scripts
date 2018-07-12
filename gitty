@@ -15,6 +15,11 @@ LOGNAME=$PROG
 LOG=/var/log/$LOGNAME.log
 LOGROCONF=/etc/logrotate.d/$LOGNAME
 
+#---------------------------------------
+# initial values
+
+SHOWALL=false
+
 #===============================================================================
 # help text
 
@@ -22,7 +27,7 @@ HELP_TXT="
 This script runs:
   # git branch -a --color
   # git show-ref |egrep -i 'master|$BRANCH'
-  # git log --graph --all --decorate --abbrev-commit --oneline |head -10
+  # git log --graph --all --decorate --abbrev-commit --oneline
   # git status
 
 SYNTAX:
@@ -34,6 +39,7 @@ OPTIONS:
   -v, --verbose      be verbose
   -vv, --debug       turn on debugging (very verbose)
   -dr, --dryrun      do a dry run
+  -a, --show-all     don't cut off any output (noramlly, only 10 lines of each 'git' command are shown)
 
 EXAMPLES:
   Normal operation:  # $PROG
@@ -61,13 +67,14 @@ NOTES:
 
 while (( "$#" > 0 )) ;do
   case $1 in
-    -h|--help)     f_usage 0                               ;;
-    -v|--verbose)  VERBOSE=true ;shift                     ;;
-    -l|--log)      LOGGING=true ;shift                     ;;
-    -vv|--debug)   VERBOSE=true ;DEBUG=true ;shift         ;;
-    -dr|--dryrun)  VERBOSE=true ;DRYRUN=true ;shift        ;;
-    "")            break                                   ;;
-    *)             f_msg -e "Unkown option(s): $*" ;break  ;;
+    -h|--help)      f_usage 0                               ;;
+    -v|--verbose)   VERBOSE=true ;shift                     ;;
+    -l|--log)       LOGGING=true ;shift                     ;;
+    -vv|--debug)    VERBOSE=true ;DEBUG=true ;shift         ;;
+    -dr|--dryrun)   VERBOSE=true ;DRYRUN=true ;shift        ;;
+    -a|--show-all)  SHOWALL=true ;shift                     ;;
+    "")             break                                   ;;
+    *)              f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
 
@@ -80,11 +87,11 @@ f_msg -d "VERBOSE=$VERBOSE"
 f_msg -d "LOGGING=$LOGGING"
 f_msg -d "DEBUG=$DEBUG"
 f_msg -d "DRYRUN=$DRYRUN"
+f_msg -d "SHOWALL=$SHOWALL"
 
 #---------------------------------------
 # error checks
 
-#f_vroot  # verify root execution
 if [[ ! -d ./.git ]] ;then
   f_msg -e "Git has not been initialized here: `pwd`"
 fi
@@ -95,21 +102,36 @@ fi
 #---------------------------------------
 # git branch
 
-f_msg "git branch -a --color"
-f_run "git branch -a --color"
+if [[ $SHOWALL == true ]] ;then
+	f_msg "git branch -a --color"
+	f_run "git branch -a --color"
+else
+	f_msg "git branch -a --color |head"
+	f_run "git branch -a --color |head"
+fi
 
 #---------------------------------------
 # git show-ref
 
 BRANCH=`git branch |awk '{print $2}'`
-f_msg "git show-ref |egrep -i 'master|$BRANCH'"
-f_run "git show-ref |egrep -i 'master|$BRANCH'"
+if [[ $SHOWALL == true ]] ;then
+	f_msg "git show-ref |egrep -i 'master|$BRANCH'"
+	f_run "git show-ref |egrep -i 'master|$BRANCH'"
+else
+	f_msg "git show-ref |egrep -i 'master|$BRANCH' |head"
+	f_run "git show-ref |egrep -i 'master|$BRANCH' |head"
+fi
 
 #---------------------------------------
 # git log
 
-f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head -10"
-f_run "git log --graph --all --decorate --abbrev-commit --oneline |head -10"
+if [[ $SHOWALL == true ]] ;then
+	f_msg "git log --graph --all --decorate --abbrev-commit --oneline |cat"
+	f_run "git log --graph --all --decorate --abbrev-commit --oneline |cat"
+else
+	f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head"
+	f_run "git log --graph --all --decorate --abbrev-commit --oneline |head"
+fi
 
 #---------------------------------------
 # git status
@@ -120,12 +142,5 @@ f_run "git status"
 #===============================================================================
 # cleanup
 
-#---------------------------------------
-# rotate log
-
 f_logro
-
-#...................
-# exit
-
 f_exit
