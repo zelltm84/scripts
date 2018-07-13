@@ -77,6 +77,8 @@ while (( "$#" > 0 )) ;do
     *)              f_msg -e "Unkown option(s): $*" ;break  ;;
   esac
 done
+VERBOSE=true
+LOGGING=false
 
 f_msg -l -d "SCRIPT START"
 
@@ -103,11 +105,11 @@ fi
 # git branch
 
 if [[ $SHOWALL == true ]] ;then
-	f_msg "git branch -a --color"
-	f_run "git branch -a --color"
+  f_msg "git branch -a --color"
+  f_run "git branch -a --color"
 else
-	f_msg "git branch -a --color |head"
-	f_run "git branch -a --color |head"
+  f_msg "git branch -a --color |head"
+  f_run "git branch -a --color |head"
 fi
 
 #---------------------------------------
@@ -115,22 +117,22 @@ fi
 
 BRANCH=`git branch |awk '{print $2}'`
 if [[ $SHOWALL == true ]] ;then
-	f_msg "git show-ref |egrep -i 'master|$BRANCH'"
-	f_run "git show-ref |egrep -i 'master|$BRANCH'"
+  f_msg "git show-ref |egrep -i 'master|$BRANCH'"
+  f_run "git show-ref |egrep -i 'master|$BRANCH'"
 else
-	f_msg "git show-ref |egrep -i 'master|$BRANCH' |head"
-	f_run "git show-ref |egrep -i 'master|$BRANCH' |head"
+  f_msg "git show-ref |egrep -i 'master|$BRANCH' |head"
+  f_run "git show-ref |egrep -i 'master|$BRANCH' |head"
 fi
 
 #---------------------------------------
 # git log
 
 if [[ $SHOWALL == true ]] ;then
-	f_msg "git log --graph --all --decorate --abbrev-commit --oneline |cat"
-	f_run "git log --graph --all --decorate --abbrev-commit --oneline |cat"
+  f_msg "git log --graph --all --decorate --abbrev-commit --oneline |cat"
+  f_run "git log --graph --all --decorate --abbrev-commit --oneline |cat"
 else
-	f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head"
-	f_run "git log --graph --all --decorate --abbrev-commit --oneline |head"
+  f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head"
+  f_run "git log --graph --all --decorate --abbrev-commit --oneline |head"
 fi
 
 #---------------------------------------
