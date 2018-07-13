@@ -25,6 +25,7 @@ SHOWALL=false
 
 HELP_TXT="
 This script runs:
+  # cat ./.git/config
   # git branch -a --color
   # git show-ref |egrep -i 'master|$BRANCH'
   # git log --graph --all --decorate --abbrev-commit --oneline
@@ -102,43 +103,34 @@ fi
 # body
 
 #---------------------------------------
-# git branch
-
-if [[ $SHOWALL == true ]] ;then
-  f_msg "git branch -a --color"
-  f_run "git branch -a --color"
-else
-  f_msg "git branch -a --color |head"
-  f_run "git branch -a --color |head"
-fi
-
-#---------------------------------------
-# git show-ref
+# git branch, show-ref, & log
 
 BRANCH=`git branch |awk '{print $2}'`
+
 if [[ $SHOWALL == true ]] ;then
-  f_msg "git show-ref |egrep -i 'master|$BRANCH'"
+  f_msg "DISPLAY GIT CONFIG"
+  f_run "cat ./.git/config"
+  f_msg "DISPLAY GIT BRANCH"
+  f_run "git branch -a --color"
+  f_msg "DISPLAY SHOW-REF"
   f_run "git show-ref |egrep -i 'master|$BRANCH'"
-else
-  f_msg "git show-ref |egrep -i 'master|$BRANCH' |head"
-  f_run "git show-ref |egrep -i 'master|$BRANCH' |head"
-fi
-
-#---------------------------------------
-# git log
-
-if [[ $SHOWALL == true ]] ;then
-  f_msg "git log --graph --all --decorate --abbrev-commit --oneline |cat"
+  f_msg "DISPLAY GIT LOG"
   f_run "git log --graph --all --decorate --abbrev-commit --oneline |cat"
 else
-  f_msg "git log --graph --all --decorate --abbrev-commit --oneline |head"
+  f_msg "DISPLAY GIT CONFIG"
+  f_run "cat ./.git/config"
+  f_msg "DISPLAY GIT BRANCH (truncated)"
+  f_run "git branch -a --color |head"
+  f_msg "DISPLAY SHOW-REF (truncated)"
+  f_run "git show-ref |egrep -i 'master|$BRANCH' |head"
+  f_msg "DISPLAY GIT LOG (truncated)"
   f_run "git log --graph --all --decorate --abbrev-commit --oneline |head"
 fi
 
 #---------------------------------------
 # git status
 
-f_msg "git status"
+f_msg "DISPLAY GIT STATUS"
 f_run "git status"
 
 #===============================================================================
